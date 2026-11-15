@@ -39,11 +39,11 @@ services:
     restart: unless-stopped
     pre_start:
     - image: ollama/ollama
-      command: ["pull", "qwen3-embedding:0.6b-q8_0"]
+      command: ["pull", "${OLLAMA_EMBEDDING_MODEL}"]
       environment:
         OLLAMA_HOST: http://ollama:11434
     - image: ollama/ollama
-      command: ["pull", "qwen3:4b-instruct-2507-q8_0"]
+      command: ["pull", "${OLLAMA_CHAT_MODEL}"]
       environment:
         OLLAMA_HOST: http://ollama:11434
     volumes:
@@ -51,8 +51,8 @@ services:
     environment:
       OLLAMA_BASE_URL: http://ollama:11434/v1
       GBRAIN_DATABASE_URL: postgresql://gbrain:${GBRAIN_POSTGRES_PASSWORD:-gbrain}@postgres:5432/gbrain
-      GBRAIN_EMBEDDING_MODEL: ollama:qwen3-embedding:0.6b-q8_0
-      GBRAIN_CHAT_MODEL: ollama:qwen3:4b-instruct-2507-q8_0
+      GBRAIN_EMBEDDING_MODEL: ollama:${OLLAMA_EMBEDDING_MODEL}
+      GBRAIN_CHAT_MODEL: ollama:${OLLAMA_CHAT_MODEL}
       GBRAIN_ADMIN_BOOTSTRAP_TOKEN: ${GBRAIN_ADMIN_BOOTSTRAP_TOKEN}
     depends_on:
       ollama:

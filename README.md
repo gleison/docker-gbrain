@@ -26,7 +26,13 @@ Copie cada valor para a variável correspondente no `.env`:
 ```dotenv
 GBRAIN_POSTGRES_PASSWORD=valor-do-primeiro-comando
 GBRAIN_ADMIN_BOOTSTRAP_TOKEN=valor-do-segundo-comando
+OLLAMA_EMBEDDING_MODEL=qwen3-embedding:0.6b-q8_0
+OLLAMA_CHAT_MODEL=qwen3:4b-instruct-2507-q8_0
 ```
+
+Cada modelo é definido uma única vez, sem o prefixo `ollama:`. O Compose usa o
+mesmo valor para baixar o modelo no `pre_start` e adiciona o prefixo ao
+repassá-lo para o GBrain.
 
 O `GBRAIN_ADMIN_BOOTSTRAP_TOKEN` é uma credencial de administrador. Não o
 compartilhe, não o inclua em logs e não versione o arquivo `.env`.
