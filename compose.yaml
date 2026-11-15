@@ -1,0 +1,49 @@
+services:
+  ollama:
+    container_name: ollama
+    image: ollama/ollama
+    restart: unless-stopped
+    volumes:
+      - "~/.ollama:/root/.ollama"
+    ports:
+      - "11434:11434"
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - local
+  gbrain:
+    container_name: gbrain
+    image: local/gbrain
+    restart: unless-stopped
+    pre_start:
+    - image: ollama/ollama
+      command: ["pull", "qwen3-embedding:0.6b-q8_0"]
+      environment:
+        OLLAMA_HOST: http://ollama:11434
+    - image: ollama/ollama
+      command: ["pull", "qwen3:4b-instruct-2507-q8_0"]
+      environment:
+        OLLAMA_HOST: http://ollama:11434
+    volumes:
+      - "~/.gbrain:/root/.gbrain"
+    environment:
+      OLLAMA_BASE_URL: http://ollama:11434/v1
+      GBRAIN_EMBEDDING_MODEL: ollama:qwen3-embedding:0.6b-q8_0
+      GBRAIN_CHAT_MODEL: ollama:qwen3:4b-instruct-2507-q8_0
+      # GBRAIN_ADMIN_BOOTSTRAP_TOKEN: ${GBRAIN_ADMIN_BOOTSTRAP_TOKEN}
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - local
+    ports:
+      - "8787:8787"
+
+networks:
+  local:
+    name: local
+    driver: bridge
