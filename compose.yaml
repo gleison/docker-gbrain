@@ -1,3 +1,19 @@
+x-llama-service: &llama-service
+  image: ${LLAMA_CPP_IMAGE:-ghcr.io/ggml-org/llama.cpp:server}
+  restart: unless-stopped
+  environment:
+    LLAMA_CACHE: /models
+  volumes:
+    - "~/.llama:/models"
+  healthcheck:
+    test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+    interval: 10s
+    timeout: 5s
+    retries: 120
+    start_period: 10s
+  networks:
+    - local
+
 services:
   postgres:
     container_name: pgvector
@@ -17,45 +33,58 @@ services:
       start_period: 10s
     networks:
       - local
-  ollama:
-    container_name: ollama
-    image: ollama/ollama
-    restart: unless-stopped
-    volumes:
-      - "~/.ollama:/root/.ollama"
-    ports:
-      - "11434:11434"
-    healthcheck:
-      test: ["CMD", "ollama", "list"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
-      start_period: 10s
-    networks:
-      - local
+  llama-embedding:
+    <<: *llama-service
+    container_name: llama-embedding
+    command:
+      - -hf
+      - ${LLAMA_EMBEDDING_MODEL}
+      - --alias
+      - ${LLAMA_EMBEDDING_ALIAS}
+      - --embeddings
+
+  llama-chat:
+    <<: *llama-service
+    container_name: llama-chat
+    command:
+      - -hf
+      - ${LLAMA_CHAT_MODEL}
+      - --alias
+      - ${LLAMA_CHAT_ALIAS}
+
+  llama-reranker:
+    <<: *llama-service
+    container_name: llama-reranker
+    command:
+      - -hf
+      - ${LLAMA_RERANKER_MODEL}
+      - --alias
+      - ${LLAMA_RERANKER_ALIAS}
+      - --reranking
+      - --pooling
+      - rank
+
   gbrain:
     container_name: gbrain
     image: local/gbrain
     restart: unless-stopped
-    pre_start:
-    - image: ollama/ollama
-      command: ["pull", "${OLLAMA_EMBEDDING_MODEL}"]
-      environment:
-        OLLAMA_HOST: http://ollama:11434
-    - image: ollama/ollama
-      command: ["pull", "${OLLAMA_CHAT_MODEL}"]
-      environment:
-        OLLAMA_HOST: http://ollama:11434
     volumes:
       - "~/.gbrain:/root/.gbrain"
     environment:
-      OLLAMA_BASE_URL: http://ollama:11434/v1
+      LLAMA_SERVER_BASE_URL: http://llama-embedding:8080/v1
+      LMSTUDIO_BASE_URL: http://llama-chat:8080/v1
+      LLAMA_SERVER_RERANKER_BASE_URL: http://llama-reranker:8080/v1
       GBRAIN_DATABASE_URL: postgresql://gbrain:${GBRAIN_POSTGRES_PASSWORD:-gbrain}@postgres:5432/gbrain?sslmode=disable
-      GBRAIN_EMBEDDING_MODEL: ollama:${OLLAMA_EMBEDDING_MODEL}
-      GBRAIN_CHAT_MODEL: ollama:${OLLAMA_CHAT_MODEL}
+      GBRAIN_EMBEDDING_MODEL: llama-server:${LLAMA_EMBEDDING_ALIAS}
+      GBRAIN_CHAT_MODEL: lmstudio:${LLAMA_CHAT_ALIAS}
+      GBRAIN_RERANKER_MODEL: llama-server-reranker:${LLAMA_RERANKER_ALIAS}
       GBRAIN_ADMIN_BOOTSTRAP_TOKEN: ${GBRAIN_ADMIN_BOOTSTRAP_TOKEN}
     depends_on:
-      ollama:
+      llama-embedding:
+        condition: service_healthy
+      llama-chat:
+        condition: service_healthy
+      llama-reranker:
         condition: service_healthy
       postgres:
         condition: service_healthy

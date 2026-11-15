@@ -6,6 +6,7 @@ CONFIG_FILE="$GBRAIN_DIR/config.json"
 
 EMBEDDING_MODEL="${GBRAIN_EMBEDDING_MODEL:-}"
 CHAT_MODEL="${GBRAIN_CHAT_MODEL:-}"
+RERANKER_MODEL="${GBRAIN_RERANKER_MODEL:-}"
 GBRAIN_DB_URL="${GBRAIN_DATABASE_URL:-}"
 
 if [ -z "$EMBEDDING_MODEL" ]; then
@@ -15,6 +16,11 @@ fi
 
 if [ -z "$CHAT_MODEL" ]; then
     echo "[ERRO] GBRAIN_CHAT_MODEL não foi definida."
+    exit 1
+fi
+
+if [ -z "$RERANKER_MODEL" ]; then
+    echo "[ERRO] GBRAIN_RERANKER_MODEL não foi definida."
     exit 1
 fi
 
@@ -57,8 +63,13 @@ gbrain config set models.chat "$CHAT_MODEL"
 gbrain config set facts.extraction_model "$CHAT_MODEL"
 gbrain config set models.expansion "$CHAT_MODEL"
 gbrain config set agent.use_gateway_loop true
-gbrain config set search.reranker.enabled false
-gbrain config set embedding_query_prefix $'Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery:'
+gbrain config set search.reranker.model "$RERANKER_MODEL"
+gbrain config set search.reranker.enabled true
+
+QUERY_PREFIX="$(printf '%s\n%s' \
+    'Instruct: Given a web search query, retrieve relevant passages that answer the query' \
+    'Query:')"
+gbrain config set embedding_query_prefix "$QUERY_PREFIX"
 
 echo "[GBrain] Iniciando servidor MCP..."
 
