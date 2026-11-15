@@ -45,8 +45,7 @@ docker compose logs -f gbrain
 ```
 
 O PostgreSQL fica acessível somente aos containers da rede `local`; a porta
-5432 não é publicada no host. Os dados são persistidos no volume nomeado
-`gbrain-postgres-data`.
+5432 não é publicada no host.
 
 Para conferir o engine após a inicialização:
 

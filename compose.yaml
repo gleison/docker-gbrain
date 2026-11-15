@@ -50,7 +50,7 @@ services:
       - "~/.gbrain:/root/.gbrain"
     environment:
       OLLAMA_BASE_URL: http://ollama:11434/v1
-      GBRAIN_DATABASE_URL: postgresql://gbrain:${GBRAIN_POSTGRES_PASSWORD:-gbrain}@postgres:5432/gbrain
+      GBRAIN_DATABASE_URL: postgresql://gbrain:${GBRAIN_POSTGRES_PASSWORD:-gbrain}@postgres:5432/gbrain?sslmode=disable
       GBRAIN_EMBEDDING_MODEL: ollama:${OLLAMA_EMBEDDING_MODEL}
       GBRAIN_CHAT_MODEL: ollama:${OLLAMA_CHAT_MODEL}
       GBRAIN_ADMIN_BOOTSTRAP_TOKEN: ${GBRAIN_ADMIN_BOOTSTRAP_TOKEN}
@@ -63,9 +63,6 @@ services:
       - local
     ports:
       - "8787:8787"
-
-volumes:
-  gbrain-postgres-data:
 
 networks:
   local:
