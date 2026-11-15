@@ -46,5 +46,4 @@ echo "[GBrain] Iniciando servidor MCP..."
 exec gbrain serve \
     --http \
     --bind 0.0.0.0 \
-    --port 8787 \
-    --print-admin-token
+    --port 8787
