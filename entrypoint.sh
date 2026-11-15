@@ -56,6 +56,9 @@ gbrain config set memory.auto_writeback salient
 gbrain config set models.chat "$CHAT_MODEL"
 gbrain config set facts.extraction_model "$CHAT_MODEL"
 gbrain config set models.expansion "$CHAT_MODEL"
+gbrain config set agent.use_gateway_loop true
+gbrain config set search.reranker.enabled false
+gbrain config set embedding_query_prefix $'Instruct: Given a web search query, retrieve relevant passages that answer the query\nQuery:'
 
 echo "[GBrain] Iniciando servidor MCP..."
 
