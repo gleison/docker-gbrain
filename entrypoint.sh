@@ -4,8 +4,24 @@ set -eu
 GBRAIN_DIR="${GBRAIN_HOME:-$HOME/.gbrain}"
 CONFIG_FILE="$GBRAIN_DIR/config.json"
 
-EMBEDDING_MODEL="${GBRAIN_EMBEDDING_MODEL:-ollama:qwen3-embedding:0.6b-q8_0}"
-CHAT_MODEL="${GBRAIN_CHAT_MODEL:-ollama:qwen3:4b-instruct-2507-q8_0}"
+EMBEDDING_MODEL="${GBRAIN_EMBEDDING_MODEL:-}"
+CHAT_MODEL="${GBRAIN_CHAT_MODEL:-}"
+GBRAIN_DB_URL="${GBRAIN_DATABASE_URL:-}"
+
+if [ -z "$EMBEDDING_MODEL" ]; then
+    echo "[ERRO] GBRAIN_EMBEDDING_MODEL não foi definida."
+    exit 1
+fi
+
+if [ -z "$CHAT_MODEL" ]; then
+    echo "[ERRO] GBRAIN_CHAT_MODEL não foi definida."
+    exit 1
+fi
+
+if [ -z "$GBRAIN_DB_URL" ]; then
+    echo "[ERRO] GBRAIN_DATABASE_URL não foi definida."
+    exit 1
+fi
 
 echo "[GBrain] Verificando configuração..."
 
@@ -20,7 +36,7 @@ if [ ! -f "$CONFIG_FILE" ]; then
     echo "[GBrain] Primeira inicialização..."
 
     gbrain init \
-        --pglite \
+        --url "$GBRAIN_DB_URL" \
         --embedding-model "$EMBEDDING_MODEL" \
         --embedding-dimensions 1024 \
         --non-interactive

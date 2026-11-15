@@ -1,4 +1,22 @@
 services:
+  postgres:
+    container_name: pgvector
+    image: pgvector/pgvector:pg16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gbrain
+      POSTGRES_PASSWORD: ${GBRAIN_POSTGRES_PASSWORD:?-gbrain}
+      POSTGRES_DB: gbrain
+    volumes:
+      - "~/.postgresql:/var/lib/postgresql"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
+    networks:
+      - local
   ollama:
     container_name: ollama
     image: ollama/ollama
@@ -32,16 +50,22 @@ services:
       - "~/.gbrain:/root/.gbrain"
     environment:
       OLLAMA_BASE_URL: http://ollama:11434/v1
+      GBRAIN_DATABASE_URL: postgresql://gbrain:${GBRAIN_POSTGRES_PASSWORD:-gbrain}@postgres:5432/gbrain
       GBRAIN_EMBEDDING_MODEL: ollama:qwen3-embedding:0.6b-q8_0
       GBRAIN_CHAT_MODEL: ollama:qwen3:4b-instruct-2507-q8_0
       GBRAIN_ADMIN_BOOTSTRAP_TOKEN: ${GBRAIN_ADMIN_BOOTSTRAP_TOKEN}
     depends_on:
       ollama:
         condition: service_healthy
+      postgres:
+        condition: service_healthy
     networks:
       - local
     ports:
       - "8787:8787"
+
+volumes:
+  gbrain-postgres-data:
 
 networks:
   local:
