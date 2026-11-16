@@ -43,7 +43,9 @@ no primeiro start e o cache é persistido em `~/.llama`.
 
 O processo de chat é apresentado ao GBrain pelo provider `openai`, apontado
 por `OPENAI_BASE_URL` para a API OpenAI-compatible do `llama-server`. O runtime
-continua sendo inteiramente local; nenhuma chamada é enviada à OpenAI.
+continua sendo inteiramente local; nenhuma chamada é enviada à OpenAI. A
+variável `OPENAI_API_KEY=local` é apenas um placeholder exigido pela validação
+do provider e não é uma credencial externa.
 
 O `GBRAIN_ADMIN_BOOTSTRAP_TOKEN` é uma credencial de administrador. Não o
 compartilhe, não o inclua em logs e não versione o arquivo `.env`.

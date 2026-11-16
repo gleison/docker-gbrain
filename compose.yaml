@@ -73,6 +73,7 @@ services:
     environment:
       LLAMA_SERVER_BASE_URL: http://llama-embedding:8080/v1
       OPENAI_BASE_URL: http://llama-chat:8080/v1
+      OPENAI_API_KEY: local
       LLAMA_SERVER_RERANKER_BASE_URL: http://llama-reranker:8080/v1
       GBRAIN_DATABASE_URL: postgresql://gbrain:${GBRAIN_POSTGRES_PASSWORD:-gbrain}@postgres:5432/gbrain?sslmode=disable
       GBRAIN_EMBEDDING_MODEL: llama-server:${LLAMA_EMBEDDING_ALIAS}
