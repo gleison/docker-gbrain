@@ -65,6 +65,10 @@ gbrain config set models.expansion "$CHAT_MODEL"
 gbrain config set agent.use_gateway_loop true
 gbrain config set search.reranker.model "$RERANKER_MODEL"
 gbrain config set search.reranker.enabled true
+gbrain config set models.think "$CHAT_MODEL"
+
+gbrain config set pricing.overrides \
+    "{\"$CHAT_MODEL\":{\"input\":0,\"output\":0}}"
 
 QUERY_PREFIX="$(printf '%s\n%s' \
     'Instruct: Given a web search query, retrieve relevant passages that answer the query' \
