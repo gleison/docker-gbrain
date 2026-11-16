@@ -24,7 +24,7 @@ services:
       POSTGRES_PASSWORD: ${GBRAIN_POSTGRES_PASSWORD:?-gbrain}
       POSTGRES_DB: gbrain
     volumes:
-      - "~/.postgresql:/var/lib/postgresql"
+      - "~/.postgres:/var/lib/postgresql/data"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
