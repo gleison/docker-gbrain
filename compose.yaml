@@ -72,11 +72,11 @@ services:
       - "~/.gbrain:/root/.gbrain"
     environment:
       LLAMA_SERVER_BASE_URL: http://llama-embedding:8080/v1
-      LMSTUDIO_BASE_URL: http://llama-chat:8080/v1
+      OPENAI_BASE_URL: http://llama-chat:8080/v1
       LLAMA_SERVER_RERANKER_BASE_URL: http://llama-reranker:8080/v1
       GBRAIN_DATABASE_URL: postgresql://gbrain:${GBRAIN_POSTGRES_PASSWORD:-gbrain}@postgres:5432/gbrain?sslmode=disable
       GBRAIN_EMBEDDING_MODEL: llama-server:${LLAMA_EMBEDDING_ALIAS}
-      GBRAIN_CHAT_MODEL: lmstudio:${LLAMA_CHAT_ALIAS}
+      GBRAIN_CHAT_MODEL: openai:${LLAMA_CHAT_ALIAS}
       GBRAIN_RERANKER_MODEL: llama-server-reranker:${LLAMA_RERANKER_ALIAS}
       GBRAIN_ADMIN_BOOTSTRAP_TOKEN: ${GBRAIN_ADMIN_BOOTSTRAP_TOKEN}
     depends_on:

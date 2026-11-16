@@ -39,11 +39,11 @@ Cada alias é definido uma única vez e usado pelo GBrain como identificador do
 modelo. As variáveis `*_MODEL` formam o endereço completo no Hugging Face e são
 usadas pelo `-hf`. Três processos `llama-server` carregam, respectivamente, os
 modelos de embedding, chat e reranking. Os GGUFs são baixados automaticamente
-no primeiro start e o cache é persistido em `~/.tmp/.llama`.
+no primeiro start e o cache é persistido em `~/.llama`.
 
-O processo de chat é apresentado ao GBrain pelo recipe OpenAI-compatible
-`lmstudio`, apenas para permitir uma URL separada da URL de embedding. O
-runtime continua sendo `llama-server`; nenhum serviço LM Studio é executado.
+O processo de chat é apresentado ao GBrain pelo provider `openai`, apontado
+por `OPENAI_BASE_URL` para a API OpenAI-compatible do `llama-server`. O runtime
+continua sendo inteiramente local; nenhuma chamada é enviada à OpenAI.
 
 O `GBRAIN_ADMIN_BOOTSTRAP_TOKEN` é uma credencial de administrador. Não o
 compartilhe, não o inclua em logs e não versione o arquivo `.env`.
@@ -66,16 +66,16 @@ a configuração nova:
 
 ```sh
 docker compose down
-mv ~/.tmp/.gbrain ~/.tmp/.gbrain-ollama-backup
-mv ~/.tmp/.postgresql ~/.tmp/.postgresql-ollama-backup
+mv ~/.gbrain ~/.gbrain-ollama-backup
+mv ~/.postgres ~/.postgres-ollama-backup
 docker compose up -d --build
 ```
 
 Os diretórios anteriores ficam preservados como backup. O cache antigo do
-Ollama em `~/.tmp/.ollama` não é usado pela configuração nova.
+Ollama em `~/.ollama` não é usado pela configuração nova.
 
 O PostgreSQL fica acessível somente aos containers da rede `local`; a porta
-5432 não é publicada no host.
+5432 não é publicada no host. Seus dados são persistidos em `~/.postgres`.
 
 Para conferir o engine após a inicialização:
 
